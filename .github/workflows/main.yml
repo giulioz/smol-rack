@@ -1,0 +1,88 @@
+# Based on https://github.com/OwlPlug/owlplug-scanner/blob/master/.github/workflows/main.yml
+name: RRV10
+
+on: 
+  push:
+    branches: 
+      - '**'
+
+jobs:
+  build-win:
+    runs-on: windows-2022
+    steps:
+    - uses: actions/checkout@v3.3.0
+      with:
+        fetch-depth: 0
+        submodules: recursive
+        token: ${{ secrets.REPO_ACCESS_TOKEN }}
+    - name: "Download Projucer"
+      run: |
+           git clone -b 8.0.1 --depth 1 https://github.com/juce-framework/JUCE JUCE
+           bash -ex ./reverb/build/download-projucer.sh
+      shell: bash
+      env:
+        OS: windows
+    - name: "Build RRV10"
+      run: sh -ex ./reverb/build/build-win.sh
+      shell: bash
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3.1.2
+      with:
+        name: RRV10-win
+        path: |
+              ./reverb/Builds/VisualStudio2022/x64/Release/VST3/RRV10.vst3
+              ./reverb/Builds/VisualStudio2022/x64/Release/Standalone Plugin/RRV10.exe
+  build-osx:
+    runs-on: macos-11
+    steps:
+    - uses: actions/checkout@v3.3.0
+      with:
+        fetch-depth: 0
+        submodules: recursive
+        token: ${{ secrets.REPO_ACCESS_TOKEN }}
+    - name: "Download Projucer"
+      run: |
+           git clone -b 8.0.1 --depth 1 https://github.com/juce-framework/JUCE JUCE
+           bash -ex ./reverb/build/download-projucer.sh
+      shell: bash
+      env:
+        OS: osx
+    - name: "Build macOS"
+      run: sh -ex ./reverb/build/build-osx.sh
+      shell: bash
+    - name: "zip macOS"
+      run: |
+           cd ./reverb/Builds/MacOSX/build/Release/
+           zip -r RRV10.vst3.macOS.zip RRV10.vst3
+           zip -r RRV10.component.macOS.zip RRV10.component
+           zip -r RRV10.app.macOS.zip RRV10.app
+           cd -
+      shell: bash
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3.1.2
+      with:
+        name: RRV10-osx
+        path: |
+              ./reverb/Builds/MacOSX/build/Release/RRV10.vst3.macOS.zip
+              ./reverb/Builds/MacOSX/build/Release/RRV10.component.macOS.zip
+              ./reverb/Builds/MacOSX/build/Release/RRV10.app.macOS.zip
+  release:
+    name: "Release"
+    needs: [build-win, build-osx]
+    if: github.ref == 'refs/heads/main'
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v3.3.0
+      - name: Retrieve artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: ./reverb/build
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.REPO_ACCESS_TOKEN }}"
+          prerelease: true
+          automatic_release_tag: latest
+          title: RRV10 Latest
+          files: |
+                 reverb/build/RRV10-osx
+                 reverb/build/RRV10-win
