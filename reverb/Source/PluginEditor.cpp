@@ -9,62 +9,128 @@
 #include "PluginEditor.h"
 #include "PluginProcessor.h"
 
+static int bgWidth = 3024;
+static int bgHeight = 591;
+static float scaleFactor = 3;
+static int uiWidth = bgWidth / scaleFactor;
+static int uiHeight = bgHeight / scaleFactor;
+
 //==============================================================================
 ReverbAudioProcessorEditor::ReverbAudioProcessorEditor(ReverbAudioProcessor &p)
     : AudioProcessorEditor(&p), audioProcessor(p) {
   addAndMakeVisible(enabledToggle);
   enabledToggle.addListener(this);
-  enabledToggle.setButtonText("Enabled");
+  enabledToggle.setAlpha(0.0f);
 
-  addAndMakeVisible(modeComboBox);
-  modeComboBox.addListener(this);
-  modeComboBox.addItem("Room 1 (Small)", 1);
-  modeComboBox.addItem("Room 2 (Large)", 2);
-  modeComboBox.addItem("Hall 1 (Small)", 3);
-  modeComboBox.addItem("Hall 2 (Large)", 4);
-  modeComboBox.addItem("Plate 1", 5);
-  modeComboBox.addItem("Plate 2", 6);
-  modeComboBox.addItem("Multi-tap 1 (Delay)", 7);
-  modeComboBox.addItem("Multi-tap 2 (Reverse)", 8);
-  modeComboBox.addItem("Gated Reverb", 9);
-  addAndMakeVisible(modeLabel);
-  modeLabel.setText("Mode", juce::dontSendNotification);
-  modeLabel.attachToComponent(&modeComboBox, true);
+  addAndMakeVisible(modeSlider);
+  modeSlider.setLookAndFeel(&knobLF);
+  modeSlider.setSliderStyle(juce::Slider::Rotary);
+  modeSlider.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+  modeSlider.setColour(juce::Slider::rotarySliderFillColourId,
+                       juce::Colour(58, 126, 94));
+  modeSlider.setRange(0, 8, 1);
+  modeSlider.setRotaryParameters(juce::MathConstants<float>::pi * 1.3f,
+                                 juce::MathConstants<float>::pi * 2.7f, true);
+  modeSlider.addListener(this);
 
-  addAndMakeVisible(dryWetSlider);
-  dryWetSlider.setRange(0, 127);
-  dryWetSlider.addListener(this);
-  addAndMakeVisible(dryWetLabel);
-  dryWetLabel.setText("Dry/Wet", juce::dontSendNotification);
-  dryWetLabel.attachToComponent(&dryWetSlider, true);
+  addAndMakeVisible(drySlider);
+  drySlider.setLookAndFeel(&knobLF);
+  drySlider.setSliderStyle(juce::Slider::Rotary);
+  drySlider.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+  drySlider.setColour(juce::Slider::rotarySliderFillColourId,
+                      juce::Colour(228, 96, 4));
+  drySlider.setRange(0, 127);
+  drySlider.addListener(this);
+
+  addAndMakeVisible(wetSlider);
+  wetSlider.setLookAndFeel(&knobLF);
+  wetSlider.setSliderStyle(juce::Slider::Rotary);
+  wetSlider.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+  wetSlider.setColour(juce::Slider::rotarySliderFillColourId,
+                      juce::Colour(228, 96, 4));
+  wetSlider.setRange(0, 127);
+  wetSlider.addListener(this);
 
   addAndMakeVisible(decayTimeSlider);
+  decayTimeSlider.setLookAndFeel(&knobLF);
+  decayTimeSlider.setSliderStyle(juce::Slider::Rotary);
+  decayTimeSlider.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+  decayTimeSlider.setColour(juce::Slider::rotarySliderFillColourId,
+                            juce::Colour(59, 124, 41));
   decayTimeSlider.setRange(0, 100);
   decayTimeSlider.addListener(this);
-  addAndMakeVisible(decayTimeLabel);
-  decayTimeLabel.setText("Decay Time", juce::dontSendNotification);
-  decayTimeLabel.attachToComponent(&decayTimeSlider, true);
 
-  setResizeLimits(600, 200, 600, 200);
-  setSize(600, 200);
+  addAndMakeVisible(preEqSlider);
+  preEqSlider.setLookAndFeel(&knobLF);
+  preEqSlider.setSliderStyle(juce::Slider::Rotary);
+  preEqSlider.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+  preEqSlider.setColour(juce::Slider::rotarySliderFillColourId,
+                        juce::Colour(234, 157, 48));
+  preEqSlider.setRange(0, 127);
+  preEqSlider.addListener(this);
+
+  setResizeLimits(uiWidth, uiHeight, uiWidth, uiHeight);
+  setSize(uiWidth, uiHeight);
 
   updateValues();
 }
 
-ReverbAudioProcessorEditor::~ReverbAudioProcessorEditor() {}
-
-void ReverbAudioProcessorEditor::resized() {
-  enabledToggle.setBounds(120, 30 + 40 * 0, 400, 25);
-  modeComboBox.setBounds(120, 30 + 40 * 1, 400, 30);
-  dryWetSlider.setBounds(120, 30 + 40 * 2, 400, 25);
-  decayTimeSlider.setBounds(120, 30 + 40 * 3, 400, 25);
+ReverbAudioProcessorEditor::~ReverbAudioProcessorEditor() {
+  modeSlider.setLookAndFeel(nullptr);
+  drySlider.setLookAndFeel(nullptr);
+  wetSlider.setLookAndFeel(nullptr);
+  decayTimeSlider.setLookAndFeel(nullptr);
+  preEqSlider.setLookAndFeel(nullptr);
 }
 
+void ReverbAudioProcessorEditor::resized() {
+  float scaleFactorCurrent = (float)bgWidth / getBounds().getWidth();
+
+  enabledToggle.setBounds(188 / scaleFactorCurrent, 212 / scaleFactorCurrent,
+                          130 / scaleFactorCurrent, 258 / scaleFactorCurrent);
+
+  const int knobSize = 200 / scaleFactorCurrent;
+  const int knobY = 230 / scaleFactorCurrent;
+  modeSlider.setBounds(409 / scaleFactorCurrent, knobY, knobSize, knobSize);
+  decayTimeSlider.setBounds(700 / scaleFactorCurrent, knobY, knobSize,
+                            knobSize);
+  preEqSlider.setBounds(995 / scaleFactorCurrent, knobY, knobSize, knobSize);
+  wetSlider.setBounds(1285 / scaleFactorCurrent, knobY, knobSize, knobSize);
+  drySlider.setBounds(1574 / scaleFactorCurrent, knobY, knobSize, knobSize);
+}
+
+void ReverbAudioProcessorEditor::paint(juce::Graphics &g) {
+  if (audioProcessor.currentPatch.enabled) {
+    g.drawImage(juce::ImageCache::getFromMemory(BinaryData::ui_bg_png,
+                                                BinaryData::ui_bg_pngSize),
+                getLocalBounds().toFloat());
+  } else {
+    g.drawImage(juce::ImageCache::getFromMemory(BinaryData::ui_bg_off_png,
+                                                BinaryData::ui_bg_off_pngSize),
+                getLocalBounds().toFloat());
+  }
+}
+
+void ReverbAudioProcessorEditor::visibilityChanged() { updateValues(); }
+
 void ReverbAudioProcessorEditor::sliderValueChanged(juce::Slider *slider) {
-  if (slider == &dryWetSlider) {
-    audioProcessor.currentPatch.effectLevel = dryWetSlider.getValue() / 127.0f;
-    audioProcessor.currentPatch.directLevel =
-        1 - dryWetSlider.getValue() / 127.0f;
+  if (slider == &modeSlider) {
+    audioProcessor.currentPatch.mode = modeSlider.getValue();
+    audioProcessor.bossEmu.setParameters(audioProcessor.currentPatch.mode,
+                                         audioProcessor.currentPatch.decayTime,
+                                         7);
+  }
+
+  if (slider == &drySlider) {
+    audioProcessor.currentPatch.directLevel = drySlider.getValue() / 127.0f;
+  }
+
+  if (slider == &wetSlider) {
+    audioProcessor.currentPatch.effectLevel = wetSlider.getValue() / 127.0f;
+  }
+
+  if (slider == &preEqSlider) {
+    audioProcessor.currentPatch.preEq = preEqSlider.getValue() / 127.0f;
   }
 
   if (slider == &decayTimeSlider) {
@@ -76,31 +142,38 @@ void ReverbAudioProcessorEditor::sliderValueChanged(juce::Slider *slider) {
   }
 }
 
-void ReverbAudioProcessorEditor::comboBoxChanged(juce::ComboBox *button) {
-  if (button == &modeComboBox) {
-    audioProcessor.currentPatch.mode = modeComboBox.getSelectedId() - 1;
-    audioProcessor.bossEmu.setParameters(audioProcessor.currentPatch.mode,
-                                         audioProcessor.currentPatch.decayTime,
-                                         7);
-  }
-}
-
 void ReverbAudioProcessorEditor::buttonClicked(juce::Button *button) {
   if (button == &enabledToggle) {
     audioProcessor.currentPatch.enabled = enabledToggle.getToggleState();
+    this->repaint();
   }
 }
 
-void ReverbAudioProcessorEditor::visibilityChanged() { updateValues(); }
+void ReverbAudioProcessorEditor::buttonStateChanged(juce::Button *button) {
+  if (button == &enabledToggle) {
+    audioProcessor.currentPatch.enabled = enabledToggle.getToggleState();
+    if (button->getState() == juce::Button::ButtonState::buttonDown) {
+      audioProcessor.currentPatch.enabled =
+          !audioProcessor.currentPatch.enabled;
+    }
+    this->repaint();
+  }
+}
 
 void ReverbAudioProcessorEditor::updateValues() {
   enabledToggle.setToggleState(audioProcessor.currentPatch.enabled,
                                juce::dontSendNotification);
-  modeComboBox.setSelectedItemIndex(audioProcessor.currentPatch.mode + 1,
-                                    juce::dontSendNotification);
-  dryWetSlider.setValue(audioProcessor.currentPatch.effectLevel * 127,
-                        juce::dontSendNotification);
+  modeSlider.setValue(audioProcessor.currentPatch.mode,
+                      juce::dontSendNotification);
+  drySlider.setValue(audioProcessor.currentPatch.directLevel * 127,
+                     juce::dontSendNotification);
+  wetSlider.setValue(audioProcessor.currentPatch.effectLevel * 127,
+                     juce::dontSendNotification);
+  preEqSlider.setValue(audioProcessor.currentPatch.preEq * 127,
+                       juce::dontSendNotification);
   decayTimeSlider.setValue((float)audioProcessor.currentPatch.decayTime / 20 *
                                127,
                            juce::dontSendNotification);
+
+  this->repaint();
 }

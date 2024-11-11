@@ -6,6 +6,7 @@
               companyName="Boss" bundleIdentifier="com.boss.rrv" pluginFormats="buildAU,buildAUv3,buildStandalone,buildVST3">
   <MAINGROUP id="Y8FC9O" name="reverb">
     <GROUP id="{8E147910-B44C-87EF-2F8D-C5CE6375CED3}" name="Source">
+      <FILE id="cjZeOD" name="KnobLF.h" compile="0" resource="0" file="Source/KnobLF.h"/>
       <FILE id="vGfaiH" name="BossEmu.h" compile="0" resource="0" file="Source/BossEmu.h"/>
       <FILE id="dB44uk" name="BossEmu.cpp" compile="1" resource="0" file="Source/BossEmu.cpp"/>
       <FILE id="wGwCwl" name="rrv10.bin" compile="0" resource="1" file="rrv10.bin"/>
@@ -17,6 +18,10 @@
             file="Source/PluginEditor.cpp"/>
       <FILE id="BVZC0e" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
+    <FILE id="nP2pCG" name="knob_high.png" compile="0" resource="1" file="knob_high.png"/>
+    <FILE id="pbMaZf" name="knob_low.png" compile="0" resource="1" file="knob_low.png"/>
+    <FILE id="ItEjdi" name="ui_bg.png" compile="0" resource="1" file="ui_bg.png"/>
+    <FILE id="ewOwva" name="ui_bg_off.png" compile="0" resource="1" file="ui_bg_off.png"/>
   </MAINGROUP>
   <MODULES>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>

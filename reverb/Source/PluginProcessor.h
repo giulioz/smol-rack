@@ -18,6 +18,7 @@ struct ReverbState {
   float directLevel = 0.5; // 0-1
   int mode = 0;            // 0-8
   int decayTime = 5;       // 0-31
+  float preEq = 0.5;       // 0-1
 };
 
 //==============================================================================
