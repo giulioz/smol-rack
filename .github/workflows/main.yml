@@ -16,6 +16,7 @@ jobs:
         submodules: recursive
     - name: "Download Projucer"
       run: |
+           cd reverb
            git clone -b 8.0.1 --depth 1 https://github.com/juce-framework/JUCE JUCE
            bash -ex ./reverb/build/download-projucer.sh
       shell: bash
@@ -40,6 +41,7 @@ jobs:
         submodules: recursive
     - name: "Download Projucer"
       run: |
+           cd reverb
            git clone -b 8.0.1 --depth 1 https://github.com/juce-framework/JUCE JUCE
            bash -ex ./reverb/build/download-projucer.sh
       shell: bash
