@@ -108,12 +108,15 @@ void ReverbAudioProcessor::processBlock(juce::AudioBuffer<float> &buffer,
     float drySampleL = channelDataL[i];
     float drySampleR = channelDataR[i];
 
-    inLeft = drySampleL * 4095; // 12 bit
-    inRight = drySampleR * 4095;
+    // float scaleFactor = 4095.0f;
+    // float scaleFactor = 8191.0f;
+    float scaleFactor = 16383.0f;
+    inLeft = drySampleL * scaleFactor;
+    inRight = drySampleR * scaleFactor;
     bossEmu.process(&inLeft, &inRight, &outLeft, &outRight, 1);
 
-    float wetSampleL = outLeft / 4095.0f;
-    float wetSampleR = outRight / 4095.0f;
+    float wetSampleL = outLeft / scaleFactor;
+    float wetSampleR = outRight / scaleFactor;
     if (currentPatch.enabled) {
       channelDataL[i] = wetSampleL * currentPatch.effectLevel +
                         drySampleL * currentPatch.directLevel;
