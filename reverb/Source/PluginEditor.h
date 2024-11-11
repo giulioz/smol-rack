@@ -17,7 +17,8 @@
  */
 class ReverbAudioProcessorEditor : public juce::AudioProcessorEditor,
                                    public juce::Slider::Listener,
-                                   public juce::Button::Listener {
+                                   public juce::Button::Listener,
+                                   public juce::ChangeListener {
 public:
   ReverbAudioProcessorEditor(ReverbAudioProcessor &);
   ~ReverbAudioProcessorEditor() override;
@@ -30,6 +31,7 @@ public:
   void sliderValueChanged(juce::Slider *) override;
   void buttonClicked(juce::Button *) override;
   void buttonStateChanged(juce::Button *) override;
+  void changeListenerCallback(juce::ChangeBroadcaster *) override;
 
   void updateValues();
 

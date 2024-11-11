@@ -40,6 +40,8 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor(ReverbAudioProcessor &p)
   drySlider.setColour(juce::Slider::rotarySliderFillColourId,
                       juce::Colour(228, 96, 4));
   drySlider.setRange(0, 127);
+  drySlider.setRotaryParameters(juce::MathConstants<float>::pi * 1.15f,
+                                juce::MathConstants<float>::pi * 2.85f, true);
   drySlider.addListener(this);
 
   addAndMakeVisible(wetSlider);
@@ -49,6 +51,8 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor(ReverbAudioProcessor &p)
   wetSlider.setColour(juce::Slider::rotarySliderFillColourId,
                       juce::Colour(228, 96, 4));
   wetSlider.setRange(0, 127);
+  wetSlider.setRotaryParameters(juce::MathConstants<float>::pi * 1.15f,
+                                juce::MathConstants<float>::pi * 2.85f, true);
   wetSlider.addListener(this);
 
   addAndMakeVisible(decayTimeSlider);
@@ -58,6 +62,9 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor(ReverbAudioProcessor &p)
   decayTimeSlider.setColour(juce::Slider::rotarySliderFillColourId,
                             juce::Colour(59, 124, 41));
   decayTimeSlider.setRange(0, 100);
+  decayTimeSlider.setRotaryParameters(juce::MathConstants<float>::pi * 1.15f,
+                                      juce::MathConstants<float>::pi * 2.85f,
+                                      true);
   decayTimeSlider.addListener(this);
 
   addAndMakeVisible(preEqSlider);
@@ -67,12 +74,16 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor(ReverbAudioProcessor &p)
   preEqSlider.setColour(juce::Slider::rotarySliderFillColourId,
                         juce::Colour(234, 157, 48));
   preEqSlider.setRange(0, 127);
+  preEqSlider.setRotaryParameters(juce::MathConstants<float>::pi * 1.15f,
+                                  juce::MathConstants<float>::pi * 2.85f, true);
   preEqSlider.addListener(this);
 
   setResizeLimits(uiWidth, uiHeight, uiWidth, uiHeight);
   setSize(uiWidth, uiHeight);
 
   updateValues();
+
+  p.addChangeListener(this);
 }
 
 ReverbAudioProcessorEditor::~ReverbAudioProcessorEditor() {
@@ -108,6 +119,13 @@ void ReverbAudioProcessorEditor::paint(juce::Graphics &g) {
     g.drawImage(juce::ImageCache::getFromMemory(BinaryData::ui_bg_off_png,
                                                 BinaryData::ui_bg_off_pngSize),
                 getLocalBounds().toFloat());
+  }
+
+  if (audioProcessor.isOverloading) {
+    float scaleFactorCurrent = (float)bgWidth / getBounds().getWidth();
+    g.setColour(juce::Colours::red);
+    g.fillEllipse(343 / scaleFactorCurrent, 113 / scaleFactorCurrent,
+                  30 / scaleFactorCurrent, 30 / scaleFactorCurrent);
   }
 }
 
@@ -158,6 +176,11 @@ void ReverbAudioProcessorEditor::buttonStateChanged(juce::Button *button) {
     }
     this->repaint();
   }
+}
+
+void ReverbAudioProcessorEditor::changeListenerCallback(
+    juce::ChangeBroadcaster *) {
+  updateValues();
 }
 
 void ReverbAudioProcessorEditor::updateValues() {

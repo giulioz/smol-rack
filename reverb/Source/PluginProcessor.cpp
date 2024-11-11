@@ -101,6 +101,9 @@ void ReverbAudioProcessor::processBlock(juce::AudioBuffer<float> &buffer,
   auto *channelDataL = buffer.getWritePointer(0);
   auto *channelDataR = buffer.getWritePointer(1);
 
+  bool prev_isOverloading = isOverloading;
+  isOverloading = false;
+
   short inLeft = 0;
   short inRight = 0;
   short outLeft, outRight;
@@ -108,11 +111,31 @@ void ReverbAudioProcessor::processBlock(juce::AudioBuffer<float> &buffer,
     float drySampleL = channelDataL[i];
     float drySampleR = channelDataR[i];
 
-    // float scaleFactor = 4095.0f;
-    // float scaleFactor = 8191.0f;
+    if (fabsf(drySampleL) > 1.3f || fabsf(drySampleR) > 1.3f) {
+      isOverloading = true;
+    }
+
+    float filteredSampleL = drySampleL;
+    float filteredSampleR = drySampleR;
+    if (currentPatch.preEq < 0.5f) {
+      // Low-pass filter
+      float cutoff = 1.0f - (0.5f - currentPatch.preEq) * 2.0f;
+      filteredSampleL = filterTempL + cutoff * (drySampleL - filterTempL);
+      filteredSampleR = filterTempR + cutoff * (drySampleR - filterTempR);
+    } else if (currentPatch.preEq > 0.5f) {
+      // High-pass filter
+      float cutoff = (currentPatch.preEq - 0.5f) * 2.0f;
+      filteredSampleL =
+          drySampleL - (filterTempL + cutoff * (drySampleL - filterTempL));
+      filteredSampleR =
+          drySampleR - (filterTempR + cutoff * (drySampleR - filterTempR));
+    }
+    filterTempL = filteredSampleL;
+    filterTempR = filteredSampleR;
+
     float scaleFactor = 16383.0f;
-    inLeft = drySampleL * scaleFactor;
-    inRight = drySampleR * scaleFactor;
+    inLeft = filteredSampleL * scaleFactor;
+    inRight = filteredSampleR * scaleFactor;
     bossEmu.process(&inLeft, &inRight, &outLeft, &outRight, 1);
 
     float wetSampleL = outLeft / scaleFactor;
@@ -123,6 +146,10 @@ void ReverbAudioProcessor::processBlock(juce::AudioBuffer<float> &buffer,
       channelDataR[i] = wetSampleR * currentPatch.effectLevel +
                         drySampleR * currentPatch.directLevel;
     }
+  }
+
+  if (isOverloading != prev_isOverloading) {
+    sendChangeMessage();
   }
 }
 
@@ -146,6 +173,7 @@ void ReverbAudioProcessor::setStateInformation(const void *data,
   memcpy(&currentPatch, data, sizeof(ReverbState));
   bossEmu.reset();
   bossEmu.setParameters(currentPatch.mode, currentPatch.decayTime, 7);
+  sendChangeMessage();
 }
 
 //==============================================================================

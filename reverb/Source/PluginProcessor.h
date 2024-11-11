@@ -24,10 +24,14 @@ struct ReverbState {
 //==============================================================================
 /**
  */
-class ReverbAudioProcessor : public juce::AudioProcessor {
+class ReverbAudioProcessor : public juce::AudioProcessor,
+                             public juce::ChangeBroadcaster {
 public:
   ReverbState currentPatch;
   BossEmu bossEmu;
+  bool isOverloading = false;
+  float filterTempL = 0;
+  float filterTempR = 0;
 
   //==============================================================================
   ReverbAudioProcessor();
