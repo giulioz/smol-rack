@@ -18,7 +18,7 @@ jobs:
       run: |
            cd reverb
            git clone -b 8.0.1 --depth 1 https://github.com/juce-framework/JUCE JUCE
-           bash -ex ./reverb/build/download-projucer.sh
+           bash -ex ./build/download-projucer.sh
       shell: bash
       env:
         OS: windows
@@ -43,7 +43,7 @@ jobs:
       run: |
            cd reverb
            git clone -b 8.0.1 --depth 1 https://github.com/juce-framework/JUCE JUCE
-           bash -ex ./reverb/build/download-projucer.sh
+           bash -ex ./build/download-projucer.sh
       shell: bash
       env:
         OS: osx
