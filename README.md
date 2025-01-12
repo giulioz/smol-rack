@@ -4,6 +4,15 @@ AU/VST digital emulation plugins of the Micro Rack effect series from the 80s, f
 
 ![The Micro Rack series](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj5ijMQdRnU85cu9DdGSU1TaKpQSMjVFGgnNyqHLtWigSVUK7LscpbC2c08TNqrjSjcwYDu1otnxFwSNfIUJGI9YC5vao4X6ZuOWuZeYDc9zrQ5-HEb7GXZeSz6WaZEzxuau5ww/s640/1.jpg)
 
+## Downloads
+
+- **RRV-10**
+  - [MacOS AU](https://github.com/giulioz/smol-rack/releases/download/latest/RRV10.component.macOS.zip)
+  - [MacOS VST](https://github.com/giulioz/smol-rack/releases/download/latest/RRV10.vst3.macOS.zip)
+  - [Windows VST](https://github.com/giulioz/smol-rack/releases/download/latest/RRV10.vst3)
+
+## Models
+
 The following models are planned to be supported. The other models are analog-based, so they are much more complicated to emulate.
 
 - ✅ **RRV-10 Digital Reverb**: using the HG61H20R36F chip emulator from the MUNT project, already working
