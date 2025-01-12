@@ -33,7 +33,7 @@ jobs:
               ./reverb/Builds/VisualStudio2022/x64/Release/VST3/RRV10.vst3
               ./reverb/Builds/VisualStudio2022/x64/Release/Standalone Plugin/RRV10.exe
   build-osx:
-    runs-on: macos-11
+    runs-on: macos-13
     steps:
     - uses: actions/checkout@v3.3.0
       with:
