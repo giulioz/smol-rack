@@ -88,15 +88,15 @@ jobs:
     - name: Install XmlStarlet
       run: sudo apt install xmlstarlet
     - name: "Build Linux"
-      run: sh -ex ./build/build-linux.sh
+      run: sh -ex ./reverb/build/build-linux.sh
       shell: bash
     - name: Upload Artifact
       uses: actions/upload-artifact@v3.1.2
       with:
         name: RRV10-linux
         path: |
-              ./Builds/LinuxMakefile/build/RRV10.vst3
-              ./Builds/LinuxMakefile/build/RRV10
+              ./reverb/Builds/LinuxMakefile/build/RRV10.vst3
+              ./reverb/Builds/LinuxMakefile/build/RRV10
   release:
     name: "Release"
     needs: [build-win, build-osx]
