@@ -73,7 +73,6 @@ jobs:
       with:
         fetch-depth: 0
         submodules: recursive
-        token: ${{ secrets.REPO_ACCESS_TOKEN }}
     - name: "Download Projucer"
       run: |
            cd reverb
