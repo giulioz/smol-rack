@@ -66,6 +66,38 @@ jobs:
               ./reverb/Builds/MacOSX/build/Release/RRV10.vst3.macOS.zip
               ./reverb/Builds/MacOSX/build/Release/RRV10.component.macOS.zip
               ./reverb/Builds/MacOSX/build/Release/RRV10.app.macOS.zip
+  build-linux:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v3.3.0
+      with:
+        fetch-depth: 0
+        submodules: recursive
+        token: ${{ secrets.REPO_ACCESS_TOKEN }}
+    - name: "Download Projucer"
+      run: |
+           cd reverb
+           git clone -b 7.0.5 --depth 1 https://github.com/juce-framework/JUCE JUCE
+           bash -ex ./build/download-projucer.sh
+      shell: bash
+      env:
+        OS: linux
+    - name : Update packages
+      run: sudo apt update
+    - name : Install Juce dev dependencies
+      run: sudo apt install libasound2-dev libjack-jackd2-dev ladspa-sdk libcurl4-openssl-dev libfreetype6-dev libx11-dev libxcomposite-dev libxcursor-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev mesa-common-dev
+    - name: Install XmlStarlet
+      run: sudo apt install xmlstarlet
+    - name: "Build Linux"
+      run: sh -ex ./build/build-linux.sh
+      shell: bash
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3.1.2
+      with:
+        name: RRV10-linux
+        path: |
+              ./Builds/LinuxMakefile/build/RRV10.vst3
+              ./Builds/LinuxMakefile/build/RRV10
   release:
     name: "Release"
     needs: [build-win, build-osx]
@@ -84,5 +116,6 @@ jobs:
           automatic_release_tag: latest
           title: RRV10 Latest
           files: |
+                 reverb/build/RRV10-linux
                  reverb/build/RRV10-osx
                  reverb/build/RRV10-win
