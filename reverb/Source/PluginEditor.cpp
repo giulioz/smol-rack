@@ -92,6 +92,8 @@ ReverbAudioProcessorEditor::~ReverbAudioProcessorEditor() {
   wetSlider.setLookAndFeel(nullptr);
   decayTimeSlider.setLookAndFeel(nullptr);
   preEqSlider.setLookAndFeel(nullptr);
+
+  audioProcessor.removeChangeListener(this);
 }
 
 void ReverbAudioProcessorEditor::resized() {

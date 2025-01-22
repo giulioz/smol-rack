@@ -67,7 +67,10 @@ BossEmu::BossEmu(const unsigned char useROM[], const int length, const EMU_MODE 
 }
 
 BossEmu::~BossEmu() {
-	if (ram != NULL) delete ram;
+	if (ram != NULL) {
+		delete ram;
+		ram = 0;
+	}
 }
 
 void BossEmu::reset() {
