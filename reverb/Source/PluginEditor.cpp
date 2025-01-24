@@ -136,9 +136,11 @@ void ReverbAudioProcessorEditor::visibilityChanged() { updateValues(); }
 void ReverbAudioProcessorEditor::sliderValueChanged(juce::Slider *slider) {
   if (slider == &modeSlider) {
     audioProcessor.currentPatch.mode = modeSlider.getValue();
+    audioProcessor.emuLock.enter();
     audioProcessor.bossEmu.setParameters(audioProcessor.currentPatch.mode,
                                          audioProcessor.currentPatch.decayTime,
                                          7);
+    audioProcessor.emuLock.exit();
   }
 
   if (slider == &drySlider) {
@@ -156,9 +158,11 @@ void ReverbAudioProcessorEditor::sliderValueChanged(juce::Slider *slider) {
   if (slider == &decayTimeSlider) {
     audioProcessor.currentPatch.decayTime =
         decayTimeSlider.getValue() / 127.0f * 20;
+    audioProcessor.emuLock.enter();
     audioProcessor.bossEmu.setParameters(audioProcessor.currentPatch.mode,
                                          audioProcessor.currentPatch.decayTime,
                                          7);
+    audioProcessor.emuLock.exit();
   }
 }
 

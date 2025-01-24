@@ -55,6 +55,7 @@ BossEmu::BossEmu(const unsigned char useROM[], const int length, const EMU_MODE 
 		return;
 	}
 	extendedModesEnabled = length == MAX_ROM_SIZE;
+	romSize = length;
 	rom = useROM;
 	ram = new short[RAM_SIZE];
 	memset(ram, 0, sizeof(short) * RAM_SIZE);
@@ -94,11 +95,25 @@ void BossEmu::setRawParameters(int programIx, int sawBitIx) {
 void BossEmu::setParameters(int mode, int time, int level) {
 	if (emuMode == MT32_EMU_MODE) {
 		mode = extendedModesEnabled ? mode & 7 : mode & 3;
-		romBaseIx = (mode << 12) | ((level & 7) << 9) | ((time & 4) << 6);
+		size_t romBase = (mode << 12) | ((level & 7) << 9) | ((time & 4) << 6);
+		if (romBase >= romSize) {
+			// Invalid mode
+			romBaseIx = 0;
+			sawBits = 0;
+			return;
+		}
+		romBaseIx = romBase;
 		sawBits = 1 << (time & 3);
 	} else if (emuMode == RV_2_EMU_MODE) {
 		mode = extendedModesEnabled ? mode & 0x1F : mode & 0x0F;
-		romBaseIx = (mode << 10) | ((time & 0x0C) << 6);
+		size_t romBase = (mode << 10) | ((time & 0x0C) << 6);
+		if (romBase >= romSize) {
+			// Invalid mode
+			romBaseIx = 0;
+			sawBits = 0;
+			return;
+		}
+		romBaseIx = romBase;
 		sawBits = 1 << (time & 3);
 	}
 }

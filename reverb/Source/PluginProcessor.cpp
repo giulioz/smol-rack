@@ -56,10 +56,10 @@ void ReverbAudioProcessor::changeProgramName(int index,
 //==============================================================================
 void ReverbAudioProcessor::prepareToPlay(double sampleRate,
                                          int samplesPerBlock) {
-  // Use this method as the place to do any pre-playback
-  // initialisation that you need..
+  emuLock.enter();
   bossEmu.reset();
   bossEmu.setParameters(currentPatch.mode, currentPatch.decayTime, 7);
+  emuLock.exit();
 }
 
 void ReverbAudioProcessor::releaseResources() {
@@ -136,7 +136,9 @@ void ReverbAudioProcessor::processBlock(juce::AudioBuffer<float> &buffer,
     float scaleFactor = 16383.0f;
     inLeft = filteredSampleL * scaleFactor;
     inRight = filteredSampleR * scaleFactor;
+    emuLock.enter();
     bossEmu.process(&inLeft, &inRight, &outLeft, &outRight, 1);
+    emuLock.exit();
 
     float wetSampleL = outLeft / scaleFactor;
     float wetSampleR = outRight / scaleFactor;
@@ -171,8 +173,12 @@ void ReverbAudioProcessor::getStateInformation(juce::MemoryBlock &destData) {
 void ReverbAudioProcessor::setStateInformation(const void *data,
                                                int sizeInBytes) {
   memcpy(&currentPatch, data, sizeof(ReverbState));
+
+  emuLock.enter();
   bossEmu.reset();
   bossEmu.setParameters(currentPatch.mode, currentPatch.decayTime, 7);
+  emuLock.exit();
+
   sendChangeMessage();
 }
 

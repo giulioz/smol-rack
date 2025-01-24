@@ -32,6 +32,7 @@ public:
   bool isOverloading = false;
   float filterTempL = 0;
   float filterTempR = 0;
+  juce::SpinLock emuLock;
 
   //==============================================================================
   ReverbAudioProcessor();

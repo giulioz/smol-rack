@@ -34,6 +34,7 @@ public:
 
 private:
 	const unsigned char *rom;
+	size_t romSize;
 	const EMU_MODE emuMode;
 	bool extendedModesEnabled;
 	short *ram;
