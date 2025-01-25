@@ -101,10 +101,10 @@
  #define JucePlugin_AUSubType              JucePlugin_PluginCode
 #endif
 #ifndef  JucePlugin_AUExportPrefix
- #define JucePlugin_AUExportPrefix         reverbAU
+ #define JucePlugin_AUExportPrefix         RRV10AU
 #endif
 #ifndef  JucePlugin_AUExportPrefixQuoted
- #define JucePlugin_AUExportPrefixQuoted   "reverbAU"
+ #define JucePlugin_AUExportPrefixQuoted   "RRV10AU"
 #endif
 #ifndef  JucePlugin_AUManufacturerCode
  #define JucePlugin_AUManufacturerCode     JucePlugin_ManufacturerCode
@@ -113,7 +113,7 @@
  #define JucePlugin_CFBundleIdentifier     com.boss.rrv
 #endif
 #ifndef  JucePlugin_AAXIdentifier
- #define JucePlugin_AAXIdentifier          com.Boss.reverb
+ #define JucePlugin_AAXIdentifier          com.Boss.RRV10
 #endif
 #ifndef  JucePlugin_AAXManufacturerCode
  #define JucePlugin_AAXManufacturerCode    JucePlugin_ManufacturerCode
@@ -152,10 +152,10 @@
  #define JucePlugin_ARATransformationFlags  0
 #endif
 #ifndef  JucePlugin_ARAFactoryID
- #define JucePlugin_ARAFactoryID           "com.Boss.reverb.factory"
+ #define JucePlugin_ARAFactoryID           "com.Boss.RRV10.factory"
 #endif
 #ifndef  JucePlugin_ARADocumentArchiveID
- #define JucePlugin_ARADocumentArchiveID   "com.Boss.reverb.aradocumentarchive.1.0.0"
+ #define JucePlugin_ARADocumentArchiveID   "com.Boss.RRV10.aradocumentarchive.1.0.0"
 #endif
 #ifndef  JucePlugin_ARACompatibleArchiveIDs
  #define JucePlugin_ARACompatibleArchiveIDs  ""

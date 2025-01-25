@@ -12,31 +12,34 @@
 
 #include "BossEmu.h"
 
-struct ReverbState {
-  bool enabled = true;
-  float effectLevel = 0.5; // 0-1
-  float directLevel = 0.5; // 0-1
-  int mode = 0;            // 0-8
-  int decayTime = 5;       // 0-31
-  float preEq = 0.5;       // 0-1
-};
-
 //==============================================================================
 /**
  */
 class ReverbAudioProcessor : public juce::AudioProcessor,
-                             public juce::ChangeBroadcaster {
+                             public juce::ChangeBroadcaster,
+                             public juce::AudioProcessorParameter::Listener {
 public:
-  ReverbState currentPatch;
   BossEmu bossEmu;
   bool isOverloading = false;
   float filterTempL = 0;
   float filterTempR = 0;
   juce::SpinLock emuLock;
 
+  juce::AudioParameterBool *enabled;
+  juce::AudioParameterFloat *effectLevel;
+  juce::AudioParameterFloat *directLevel;
+  juce::AudioParameterInt *mode;
+  juce::AudioParameterInt *decayTime;
+  juce::AudioParameterFloat *preEq;
+
   //==============================================================================
   ReverbAudioProcessor();
   ~ReverbAudioProcessor() override;
+
+  //==============================================================================
+  void parameterValueChanged(int parameterIndex, float newValue) override;
+  void parameterGestureChanged(int parameterIndex,
+                               bool gestureIsStarting) override;
 
   //==============================================================================
   void prepareToPlay(double sampleRate, int samplesPerBlock) override;

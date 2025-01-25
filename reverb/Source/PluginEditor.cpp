@@ -113,7 +113,7 @@ void ReverbAudioProcessorEditor::resized() {
 }
 
 void ReverbAudioProcessorEditor::paint(juce::Graphics &g) {
-  if (audioProcessor.currentPatch.enabled) {
+  if (*audioProcessor.enabled) {
     g.drawImage(juce::ImageCache::getFromMemory(BinaryData::ui_bg_png,
                                                 BinaryData::ui_bg_pngSize),
                 getLocalBounds().toFloat());
@@ -135,50 +135,46 @@ void ReverbAudioProcessorEditor::visibilityChanged() { updateValues(); }
 
 void ReverbAudioProcessorEditor::sliderValueChanged(juce::Slider *slider) {
   if (slider == &modeSlider) {
-    audioProcessor.currentPatch.mode = modeSlider.getValue();
+    *audioProcessor.mode = modeSlider.getValue();
     audioProcessor.emuLock.enter();
-    audioProcessor.bossEmu.setParameters(audioProcessor.currentPatch.mode,
-                                         audioProcessor.currentPatch.decayTime,
-                                         7);
+    audioProcessor.bossEmu.setParameters(*audioProcessor.mode,
+                                         *audioProcessor.decayTime, 7);
     audioProcessor.emuLock.exit();
   }
 
   if (slider == &drySlider) {
-    audioProcessor.currentPatch.directLevel = drySlider.getValue() / 127.0f;
+    *audioProcessor.directLevel = drySlider.getValue() / 127.0f;
   }
 
   if (slider == &wetSlider) {
-    audioProcessor.currentPatch.effectLevel = wetSlider.getValue() / 127.0f;
+    *audioProcessor.effectLevel = wetSlider.getValue() / 127.0f;
   }
 
   if (slider == &preEqSlider) {
-    audioProcessor.currentPatch.preEq = preEqSlider.getValue() / 127.0f;
+    *audioProcessor.preEq = preEqSlider.getValue() / 127.0f;
   }
 
   if (slider == &decayTimeSlider) {
-    audioProcessor.currentPatch.decayTime =
-        decayTimeSlider.getValue() / 127.0f * 20;
+    *audioProcessor.decayTime = decayTimeSlider.getValue() / 127.0f * 20;
     audioProcessor.emuLock.enter();
-    audioProcessor.bossEmu.setParameters(audioProcessor.currentPatch.mode,
-                                         audioProcessor.currentPatch.decayTime,
-                                         7);
+    audioProcessor.bossEmu.setParameters(*audioProcessor.mode,
+                                         *audioProcessor.decayTime, 7);
     audioProcessor.emuLock.exit();
   }
 }
 
 void ReverbAudioProcessorEditor::buttonClicked(juce::Button *button) {
   if (button == &enabledToggle) {
-    audioProcessor.currentPatch.enabled = enabledToggle.getToggleState();
+    *audioProcessor.enabled = enabledToggle.getToggleState();
     this->repaint();
   }
 }
 
 void ReverbAudioProcessorEditor::buttonStateChanged(juce::Button *button) {
   if (button == &enabledToggle) {
-    audioProcessor.currentPatch.enabled = enabledToggle.getToggleState();
+    *audioProcessor.enabled = enabledToggle.getToggleState();
     if (button->getState() == juce::Button::ButtonState::buttonDown) {
-      audioProcessor.currentPatch.enabled =
-          !audioProcessor.currentPatch.enabled;
+      *audioProcessor.enabled = !*audioProcessor.enabled;
     }
     this->repaint();
   }
@@ -190,18 +186,15 @@ void ReverbAudioProcessorEditor::changeListenerCallback(
 }
 
 void ReverbAudioProcessorEditor::updateValues() {
-  enabledToggle.setToggleState(audioProcessor.currentPatch.enabled,
+  enabledToggle.setToggleState(*audioProcessor.enabled,
                                juce::dontSendNotification);
-  modeSlider.setValue(audioProcessor.currentPatch.mode,
-                      juce::dontSendNotification);
-  drySlider.setValue(audioProcessor.currentPatch.directLevel * 127,
+  modeSlider.setValue(*audioProcessor.mode, juce::dontSendNotification);
+  drySlider.setValue(*audioProcessor.directLevel * 127,
                      juce::dontSendNotification);
-  wetSlider.setValue(audioProcessor.currentPatch.effectLevel * 127,
+  wetSlider.setValue(*audioProcessor.effectLevel * 127,
                      juce::dontSendNotification);
-  preEqSlider.setValue(audioProcessor.currentPatch.preEq * 127,
-                       juce::dontSendNotification);
-  decayTimeSlider.setValue((float)audioProcessor.currentPatch.decayTime / 20 *
-                               127,
+  preEqSlider.setValue(*audioProcessor.preEq * 127, juce::dontSendNotification);
+  decayTimeSlider.setValue((float)*audioProcessor.decayTime / 20 * 127,
                            juce::dontSendNotification);
 
   this->repaint();

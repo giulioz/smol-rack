@@ -11,6 +11,14 @@ AU/VST digital emulation plugins of the Micro Rack effect series from the 80s, f
   - [MacOS VST](https://github.com/giulioz/smol-rack/releases/download/latest/RRV10.vst3.macOS.zip)
   - [Windows VST](https://github.com/giulioz/smol-rack/releases/download/latest/RRV10.vst3)
 
+**NOTE (Windows)**: If you are having troubles with Windows 10, it's possible you need to install the [Visual C++ 2022 Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-microsoft-visual-c-redistributable-version).
+
+**NOTE (MacOs)**: If you are having troubles with MacOS, it's possible your operating system is blocking the plugin because it's coming from an unregister developer. You can allow this plugin by running this command on a terminal:
+
+```sudo xattr -rd com.apple.quarantine /Users/<yourusername>/Library/Audio/Plug-Ins/Components/RRV10.component```
+
+More info on this guide: https://www.osirisguitar.com/2020/04/01/how-to-make-unsigned-vsts-work-in-macos-catalina/
+
 ## Models
 
 The following models are planned to be supported. The other models are analog-based, so they are much more complicated to emulate.

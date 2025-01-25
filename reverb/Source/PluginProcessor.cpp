@@ -16,9 +16,59 @@ ReverbAudioProcessor::ReverbAudioProcessor()
               .withInput("Input", juce::AudioChannelSet::stereo(), true)
               .withOutput("Output", juce::AudioChannelSet::stereo(), true)),
       bossEmu((unsigned char *)BinaryData::rrv10_bin, BinaryData::rrv10_binSize,
-              BossEmu::RV_2_EMU_MODE) {}
+              BossEmu::RV_2_EMU_MODE) {
+
+  addParameter(enabled =
+                   new juce::AudioParameterBool("enabled", // parameterID
+                                                "Enabled", // parameter name
+                                                true));    // default value
+  addParameter(effectLevel = new juce::AudioParameterFloat(
+                   "effectLevel",  // parameterID
+                   "Effect Level", // parameter name
+                   0.0f,           // minimum value
+                   1.0f,           // maximum value
+                   0.4f));         // default value
+  addParameter(directLevel = new juce::AudioParameterFloat(
+                   "directLevel",                         // parameterID
+                   "Direct Level",                        // parameter name
+                   0.0f,                                  // minimum value
+                   1.0f,                                  // maximum value
+                   1.0f));                                // default value
+  addParameter(mode = new juce::AudioParameterInt("mode", // parameterID
+                                                  "Mode", // parameter name
+                                                  0,      // minimum value
+                                                  8,      // maximum value
+                                                  0));    // default value
+  addParameter(decayTime =
+                   new juce::AudioParameterInt("decayTime",    // parameterID
+                                               "Decay Time",   // parameter name
+                                               0,              // minimum value
+                                               31,             // maximum value
+                                               5));            // default value
+  addParameter(preEq = new juce::AudioParameterFloat("preEq",  // parameterID
+                                                     "Pre Eq", // parameter name
+                                                     0.0f,     // minimum value
+                                                     1.0f,     // maximum value
+                                                     0.5f));   // default value
+
+  enabled->addListener(this);
+  effectLevel->addListener(this);
+  directLevel->addListener(this);
+  mode->addListener(this);
+  decayTime->addListener(this);
+  preEq->addListener(this);
+}
 
 ReverbAudioProcessor::~ReverbAudioProcessor() {}
+
+//==============================================================================
+void ReverbAudioProcessor::parameterValueChanged(int parameterIndex,
+                                                 float newValue) {
+  sendChangeMessage();
+}
+
+void ReverbAudioProcessor::parameterGestureChanged(int parameterIndex,
+                                                   bool gestureIsStarting) {}
 
 //==============================================================================
 const juce::String ReverbAudioProcessor::getName() const {
@@ -58,7 +108,7 @@ void ReverbAudioProcessor::prepareToPlay(double sampleRate,
                                          int samplesPerBlock) {
   emuLock.enter();
   bossEmu.reset();
-  bossEmu.setParameters(currentPatch.mode, currentPatch.decayTime, 7);
+  bossEmu.setParameters(*mode, *decayTime, 7);
   emuLock.exit();
 }
 
@@ -117,14 +167,14 @@ void ReverbAudioProcessor::processBlock(juce::AudioBuffer<float> &buffer,
 
     float filteredSampleL = drySampleL;
     float filteredSampleR = drySampleR;
-    if (currentPatch.preEq < 0.5f) {
+    if (*preEq < 0.5f) {
       // Low-pass filter
-      float cutoff = 1.0f - (0.5f - currentPatch.preEq) * 2.0f;
+      float cutoff = 1.0f - (0.5f - *preEq) * 2.0f;
       filteredSampleL = filterTempL + cutoff * (drySampleL - filterTempL);
       filteredSampleR = filterTempR + cutoff * (drySampleR - filterTempR);
-    } else if (currentPatch.preEq > 0.5f) {
+    } else if (*preEq > 0.5f) {
       // High-pass filter
-      float cutoff = (currentPatch.preEq - 0.5f) * 2.0f;
+      float cutoff = (*preEq - 0.5f) * 2.0f;
       filteredSampleL =
           drySampleL - (filterTempL + cutoff * (drySampleL - filterTempL));
       filteredSampleR =
@@ -142,11 +192,9 @@ void ReverbAudioProcessor::processBlock(juce::AudioBuffer<float> &buffer,
 
     float wetSampleL = outLeft / scaleFactor;
     float wetSampleR = outRight / scaleFactor;
-    if (currentPatch.enabled) {
-      channelDataL[i] = wetSampleL * currentPatch.effectLevel +
-                        drySampleL * currentPatch.directLevel;
-      channelDataR[i] = wetSampleR * currentPatch.effectLevel +
-                        drySampleR * currentPatch.directLevel;
+    if (*enabled) {
+      channelDataL[i] = wetSampleL * *effectLevel + drySampleL * *directLevel;
+      channelDataR[i] = wetSampleR * *effectLevel + drySampleR * *directLevel;
     }
   }
 
@@ -166,17 +214,35 @@ juce::AudioProcessorEditor *ReverbAudioProcessor::createEditor() {
 
 //==============================================================================
 void ReverbAudioProcessor::getStateInformation(juce::MemoryBlock &destData) {
-  destData.ensureSize(sizeof(ReverbState));
-  destData.replaceAll(&currentPatch, sizeof(ReverbState));
+  std::unique_ptr<juce::XmlElement> xml(new juce::XmlElement("RRV10"));
+  xml->setAttribute("enabled", (bool)*enabled);
+  xml->setAttribute("effectLevel", (double)*effectLevel);
+  xml->setAttribute("directLevel", (double)*directLevel);
+  xml->setAttribute("mode", (int)*mode);
+  xml->setAttribute("decayTime", (int)*decayTime);
+  xml->setAttribute("preEq", (double)*preEq);
+  copyXmlToBinary(*xml, destData);
 }
 
 void ReverbAudioProcessor::setStateInformation(const void *data,
                                                int sizeInBytes) {
-  memcpy(&currentPatch, data, sizeof(ReverbState));
+  std::unique_ptr<juce::XmlElement> xmlState(
+      getXmlFromBinary(data, sizeInBytes));
+
+  if (xmlState.get() != nullptr) {
+    if (xmlState->hasTagName("RRV10")) {
+      *enabled = (bool)xmlState->getBoolAttribute("enabled", true);
+      *effectLevel = (float)xmlState->getDoubleAttribute("effectLevel", 0.4f);
+      *directLevel = (float)xmlState->getDoubleAttribute("directLevel", 1.0f);
+      *mode = (int)xmlState->getIntAttribute("mode", 0);
+      *decayTime = (int)xmlState->getIntAttribute("decayTime", 5);
+      *preEq = (float)xmlState->getDoubleAttribute("preEq", 0.5f);
+    }
+  }
 
   emuLock.enter();
   bossEmu.reset();
-  bossEmu.setParameters(currentPatch.mode, currentPatch.decayTime, 7);
+  bossEmu.setParameters(*mode, *decayTime, 7);
   emuLock.exit();
 
   sendChangeMessage();
