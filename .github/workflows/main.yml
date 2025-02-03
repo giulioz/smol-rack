@@ -28,7 +28,7 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: RRV10-win
+        name: RRV10-win-win
         path: |
               ./reverb/Builds/VisualStudio2022/x64/Release/VST3/RRV10.vst3
               ./reverb/Builds/VisualStudio2022/x64/Release/Standalone Plugin/RRV10.exe
@@ -61,7 +61,7 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: RRV10-osx
+        name: RRV10-osx-osx
         path: |
               ./reverb/Builds/MacOSX/build/Release/RRV10.vst3.macOS.zip
               ./reverb/Builds/MacOSX/build/Release/RRV10.component.macOS.zip
@@ -93,7 +93,7 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: RRV10-linux
+        name: RRV10-linux-linux
         path: |
               ./reverb/Builds/LinuxMakefile/build/RRV10.vst3
               ./reverb/Builds/LinuxMakefile/build/RRV10
