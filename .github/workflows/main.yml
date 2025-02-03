@@ -108,6 +108,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: ./reverb/build
+          pattern: RRV10-*
           merge-multiple: true
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
