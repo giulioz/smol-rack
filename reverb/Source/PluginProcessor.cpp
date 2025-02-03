@@ -18,38 +18,40 @@ ReverbAudioProcessor::ReverbAudioProcessor()
       bossEmu((unsigned char *)BinaryData::rrv10_bin, BinaryData::rrv10_binSize,
               BossEmu::RV_2_EMU_MODE) {
 
-  addParameter(enabled =
-                   new juce::AudioParameterBool("enabled", // parameterID
-                                                "Enabled", // parameter name
-                                                true));    // default value
+  addParameter(enabled = new juce::AudioParameterBool(
+                   juce::ParameterID{"enabled", 1}, // parameterID
+                   "Enabled",                 // parameter name
+                   true));                    // default value
   addParameter(effectLevel = new juce::AudioParameterFloat(
-                   "effectLevel",  // parameterID
-                   "Effect Level", // parameter name
-                   0.0f,           // minimum value
-                   1.0f,           // maximum value
-                   0.4f));         // default value
+                   juce::ParameterID{"effectLevel", 1}, // parameterID
+                   "Effect Level",                // parameter name
+                   0.0f,                          // minimum value
+                   1.0f,                          // maximum value
+                   0.4f));                        // default value
   addParameter(directLevel = new juce::AudioParameterFloat(
-                   "directLevel",                         // parameterID
-                   "Direct Level",                        // parameter name
-                   0.0f,                                  // minimum value
-                   1.0f,                                  // maximum value
-                   1.0f));                                // default value
-  addParameter(mode = new juce::AudioParameterInt("mode", // parameterID
-                                                  "Mode", // parameter name
-                                                  0,      // minimum value
-                                                  8,      // maximum value
-                                                  0));    // default value
-  addParameter(decayTime =
-                   new juce::AudioParameterInt("decayTime",    // parameterID
-                                               "Decay Time",   // parameter name
-                                               0,              // minimum value
-                                               31,             // maximum value
-                                               5));            // default value
-  addParameter(preEq = new juce::AudioParameterFloat("preEq",  // parameterID
-                                                     "Pre Eq", // parameter name
-                                                     0.0f,     // minimum value
-                                                     1.0f,     // maximum value
-                                                     0.5f));   // default value
+                   juce::ParameterID{"directLevel", 1}, // parameterID
+                   "Direct Level",                // parameter name
+                   0.0f,                          // minimum value
+                   1.0f,                          // maximum value
+                   1.0f));                        // default value
+  addParameter(
+      mode = new juce::AudioParameterInt(juce::ParameterID{"mode", 1}, // parameterID
+                                         "Mode", // parameter name
+                                         0,      // minimum value
+                                         8,      // maximum value
+                                         0));    // default value
+  addParameter(decayTime = new juce::AudioParameterInt(
+                   juce::ParameterID{"decayTime", 1}, // parameterID
+                   "Decay Time",                // parameter name
+                   0,                           // minimum value
+                   15,                          // maximum value
+                   5));                         // default value
+  addParameter(preEq = new juce::AudioParameterFloat(
+                   juce::ParameterID{"preEq", 1}, // parameterID
+                   "Pre Eq",                // parameter name
+                   0.0f,                    // minimum value
+                   1.0f,                    // maximum value
+                   0.5f));                  // default value
 
   enabled->addListener(this);
   effectLevel->addListener(this);
@@ -65,6 +67,12 @@ ReverbAudioProcessor::~ReverbAudioProcessor() {}
 void ReverbAudioProcessor::parameterValueChanged(int parameterIndex,
                                                  float newValue) {
   sendChangeMessage();
+
+  if (parameterIndex == mode->getParameterIndex() || parameterIndex == decayTime->getParameterIndex()) {
+    emuLock.enter();
+    bossEmu.setParameters(*mode, *decayTime, 7);
+    emuLock.exit();
+  }
 }
 
 void ReverbAudioProcessor::parameterGestureChanged(int parameterIndex,

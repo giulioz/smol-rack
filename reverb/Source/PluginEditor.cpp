@@ -165,16 +165,13 @@ void ReverbAudioProcessorEditor::sliderValueChanged(juce::Slider *slider) {
 
 void ReverbAudioProcessorEditor::buttonClicked(juce::Button *button) {
   if (button == &enabledToggle) {
-    *audioProcessor.enabled = enabledToggle.getToggleState();
-    this->repaint();
   }
 }
 
 void ReverbAudioProcessorEditor::buttonStateChanged(juce::Button *button) {
   if (button == &enabledToggle) {
-    *audioProcessor.enabled = enabledToggle.getToggleState();
     if (button->getState() == juce::Button::ButtonState::buttonDown) {
-      *audioProcessor.enabled = !*audioProcessor.enabled;
+      *audioProcessor.enabled = !(*audioProcessor.enabled);
     }
     this->repaint();
   }
