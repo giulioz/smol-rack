@@ -107,9 +107,10 @@ jobs:
       - name: Retrieve artifacts
         uses: actions/download-artifact@v4
         with:
-          path: ./reverb/build
+          path: reverb/build
           pattern: RRV10-*
           merge-multiple: true
+      - run: ls -R reverb/build
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
