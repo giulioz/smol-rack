@@ -17,7 +17,7 @@ jobs:
     - name: "Download Projucer"
       run: |
            cd reverb
-           git clone -b 8.0.1 --depth 1 https://github.com/juce-framework/JUCE JUCE
+           git clone -b 8.0.7 --depth 1 https://github.com/juce-framework/JUCE JUCE
            bash -ex ./build/download-projucer.sh
       shell: bash
       env:
@@ -42,7 +42,7 @@ jobs:
     - name: "Download Projucer"
       run: |
            cd reverb
-           git clone -b 8.0.1 --depth 1 https://github.com/juce-framework/JUCE JUCE
+           git clone -b 8.0.7 --depth 1 https://github.com/juce-framework/JUCE JUCE
            bash -ex ./build/download-projucer.sh
       shell: bash
       env:
