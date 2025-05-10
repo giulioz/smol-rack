@@ -24,7 +24,7 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor(ReverbAudioProcessor &p)
 
   addAndMakeVisible(modeSlider);
   modeSlider.setLookAndFeel(&knobLF);
-  modeSlider.setSliderStyle(juce::Slider::Rotary);
+  modeSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
   modeSlider.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
   modeSlider.setColour(juce::Slider::rotarySliderFillColourId,
                        juce::Colour(58, 126, 94));
@@ -35,33 +35,33 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor(ReverbAudioProcessor &p)
 
   addAndMakeVisible(drySlider);
   drySlider.setLookAndFeel(&knobLF);
-  drySlider.setSliderStyle(juce::Slider::Rotary);
+  drySlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
   drySlider.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
   drySlider.setColour(juce::Slider::rotarySliderFillColourId,
                       juce::Colour(228, 96, 4));
-  drySlider.setRange(0, 127);
+  drySlider.setRange(0, 1);
   drySlider.setRotaryParameters(juce::MathConstants<float>::pi * 1.15f,
                                 juce::MathConstants<float>::pi * 2.85f, true);
   drySlider.addListener(this);
 
   addAndMakeVisible(wetSlider);
   wetSlider.setLookAndFeel(&knobLF);
-  wetSlider.setSliderStyle(juce::Slider::Rotary);
+  wetSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
   wetSlider.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
   wetSlider.setColour(juce::Slider::rotarySliderFillColourId,
                       juce::Colour(228, 96, 4));
-  wetSlider.setRange(0, 127);
+  wetSlider.setRange(0, 1);
   wetSlider.setRotaryParameters(juce::MathConstants<float>::pi * 1.15f,
                                 juce::MathConstants<float>::pi * 2.85f, true);
   wetSlider.addListener(this);
 
   addAndMakeVisible(decayTimeSlider);
   decayTimeSlider.setLookAndFeel(&knobLF);
-  decayTimeSlider.setSliderStyle(juce::Slider::Rotary);
+  decayTimeSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
   decayTimeSlider.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
   decayTimeSlider.setColour(juce::Slider::rotarySliderFillColourId,
                             juce::Colour(59, 124, 41));
-  decayTimeSlider.setRange(0, 100);
+  decayTimeSlider.setRange(0, 1);
   decayTimeSlider.setRotaryParameters(juce::MathConstants<float>::pi * 1.15f,
                                       juce::MathConstants<float>::pi * 2.85f,
                                       true);
@@ -69,11 +69,11 @@ ReverbAudioProcessorEditor::ReverbAudioProcessorEditor(ReverbAudioProcessor &p)
 
   addAndMakeVisible(preEqSlider);
   preEqSlider.setLookAndFeel(&knobLF);
-  preEqSlider.setSliderStyle(juce::Slider::Rotary);
+  preEqSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
   preEqSlider.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
   preEqSlider.setColour(juce::Slider::rotarySliderFillColourId,
                         juce::Colour(234, 157, 48));
-  preEqSlider.setRange(0, 127);
+  preEqSlider.setRange(0, 1);
   preEqSlider.setRotaryParameters(juce::MathConstants<float>::pi * 1.15f,
                                   juce::MathConstants<float>::pi * 2.85f, true);
   preEqSlider.addListener(this);
@@ -143,22 +143,22 @@ void ReverbAudioProcessorEditor::sliderValueChanged(juce::Slider *slider) {
   }
 
   if (slider == &drySlider) {
-    *audioProcessor.directLevel = drySlider.getValue() / 127.0f;
+    *audioProcessor.directLevel = drySlider.getValue();
   }
 
   if (slider == &wetSlider) {
-    *audioProcessor.effectLevel = wetSlider.getValue() / 127.0f;
+    *audioProcessor.effectLevel = wetSlider.getValue();
   }
 
   if (slider == &preEqSlider) {
-    *audioProcessor.preEq = preEqSlider.getValue() / 127.0f;
+    *audioProcessor.preEq = preEqSlider.getValue();
   }
 
   if (slider == &decayTimeSlider) {
-    *audioProcessor.decayTime = decayTimeSlider.getValue() / 127.0f * 20;
+    *audioProcessor.decayTime = decayTimeSlider.getValue() * 20.0f;
     audioProcessor.emuLock.enter();
     audioProcessor.bossEmu.setParameters(*audioProcessor.mode,
-                                         *audioProcessor.decayTime, 7);
+                                         (int)(*audioProcessor.decayTime), 7);
     audioProcessor.emuLock.exit();
   }
 }
@@ -186,12 +186,10 @@ void ReverbAudioProcessorEditor::updateValues() {
   enabledToggle.setToggleState(*audioProcessor.enabled,
                                juce::dontSendNotification);
   modeSlider.setValue(*audioProcessor.mode, juce::dontSendNotification);
-  drySlider.setValue(*audioProcessor.directLevel * 127,
-                     juce::dontSendNotification);
-  wetSlider.setValue(*audioProcessor.effectLevel * 127,
-                     juce::dontSendNotification);
-  preEqSlider.setValue(*audioProcessor.preEq * 127, juce::dontSendNotification);
-  decayTimeSlider.setValue((float)*audioProcessor.decayTime / 20 * 127,
+  drySlider.setValue(*audioProcessor.directLevel, juce::dontSendNotification);
+  wetSlider.setValue(*audioProcessor.effectLevel, juce::dontSendNotification);
+  preEqSlider.setValue(*audioProcessor.preEq, juce::dontSendNotification);
+  decayTimeSlider.setValue((float)(*audioProcessor.decayTime) / 15.0f,
                            juce::dontSendNotification);
 
   this->repaint();

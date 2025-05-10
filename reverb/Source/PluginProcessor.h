@@ -29,7 +29,7 @@ public:
   juce::AudioParameterFloat *effectLevel;
   juce::AudioParameterFloat *directLevel;
   juce::AudioParameterInt *mode;
-  juce::AudioParameterInt *decayTime;
+  juce::AudioParameterFloat *decayTime;
   juce::AudioParameterFloat *preEq;
 
   //==============================================================================

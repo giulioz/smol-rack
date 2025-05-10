@@ -40,12 +40,12 @@ ReverbAudioProcessor::ReverbAudioProcessor()
                                          0,      // minimum value
                                          8,      // maximum value
                                          0));    // default value
-  addParameter(decayTime = new juce::AudioParameterInt(
+  addParameter(decayTime = new juce::AudioParameterFloat(
                    juce::ParameterID{"decayTime", 1}, // parameterID
                    "Decay Time",                // parameter name
-                   0,                           // minimum value
-                   15,                          // maximum value
-                   5));                         // default value
+                   0.0f,                        // minimum value
+                   15.0f,                       // maximum value
+                   5.0f));                      // default value
   addParameter(preEq = new juce::AudioParameterFloat(
                    juce::ParameterID{"preEq", 1}, // parameterID
                    "Pre Eq",                // parameter name
@@ -227,7 +227,7 @@ void ReverbAudioProcessor::getStateInformation(juce::MemoryBlock &destData) {
   xml->setAttribute("effectLevel", (double)*effectLevel);
   xml->setAttribute("directLevel", (double)*directLevel);
   xml->setAttribute("mode", (int)*mode);
-  xml->setAttribute("decayTime", (int)*decayTime);
+  xml->setAttribute("decayTime", (double)*decayTime);
   xml->setAttribute("preEq", (double)*preEq);
   copyXmlToBinary(*xml, destData);
 }
@@ -243,7 +243,7 @@ void ReverbAudioProcessor::setStateInformation(const void *data,
       *effectLevel = (float)xmlState->getDoubleAttribute("effectLevel", 0.4f);
       *directLevel = (float)xmlState->getDoubleAttribute("directLevel", 1.0f);
       *mode = (int)xmlState->getIntAttribute("mode", 0);
-      *decayTime = (int)xmlState->getIntAttribute("decayTime", 5);
+      *decayTime = (double)xmlState->getIntAttribute("decayTime", 5.0f);
       *preEq = (float)xmlState->getDoubleAttribute("preEq", 0.5f);
     }
   }
