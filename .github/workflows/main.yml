@@ -67,7 +67,7 @@ jobs:
               ./reverb/Builds/MacOSX/build/Release/RRV10.component.macOS.zip
               ./reverb/Builds/MacOSX/build/Release/RRV10.app.macOS.zip
   build-linux:
-    runs-on: ubuntu-20.04
+    runs-on: "ubuntu-latest"
     steps:
     - uses: actions/checkout@v3.3.0
       with:
