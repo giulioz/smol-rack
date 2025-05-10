@@ -83,8 +83,6 @@ jobs:
         OS: linux
     - name : Update packages
       run: sudo apt update
-    - name: Install XmlStarlet
-      run: sudo apt install xmlstarlet
     - name: "Build Linux"
       run: sh -ex ./reverb/build/build-linux.sh
       shell: bash
