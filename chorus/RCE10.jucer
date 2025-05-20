@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="EU3mWO" name="RCE10" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" pluginManufacturerCode="BOSS"
-              pluginCode="RCER" pluginName="RCE10" pluginDesc="RCE10" pluginManufacturer="Boss"
-              companyName="Boss" bundleIdentifier="com.boss.rce" pluginFormats="buildAU,buildAUv3,buildStandalone,buildVST3">
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" pluginManufacturerCode="GlZs"
+              pluginCode="RCER" pluginName="RCE10" pluginDesc="RCE10" pluginManufacturer="Giulio Zausa"
+              companyName="Giulio Zausa" bundleIdentifier="com.glzs.rce" pluginFormats="buildAU,buildAUv3,buildStandalone,buildVST3">
   <MAINGROUP id="Y8FC9O" name="chorus">
     <GROUP id="{8E147910-B44C-87EF-2F8D-C5CE6375CED3}" name="Source">
       <FILE id="cjZeOD" name="KnobLF.h" compile="0" resource="0" file="Source/KnobLF.h"/>
